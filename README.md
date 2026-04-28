@@ -23,3 +23,8 @@ Em vez de simplesmente listar o que o dado mostra superficialmente, nós o inter
 
 ### 🧠 Metodologia do Projeto
 O código foi estruturado para responder essas cinco perguntas utilizando Python (Pandas, Matplotlib, Seaborn) e testes estatísticos específicos para evitar conclusões precipitadas baseadas apenas em visualizações bonitas.
+
+
+Link dos Dados
+https://www.kaggle.com/datasets/michaelmatta0/amazon-cell-phones-cleaned-scraped-data
+
