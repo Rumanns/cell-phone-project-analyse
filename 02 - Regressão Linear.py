@@ -69,6 +69,8 @@ plt.show()
 
 print(f"\n✅ RESPOSTA 1: Cada 1 dólar de aumento no preço reduz as vendas em {abs(coeficiente):.2f} unidades.")
 
+
+
 # ============================================
 # PERGUNTA 2: Ponto de Topo (Desconto Ideal)
 # ============================================
@@ -146,3 +148,295 @@ else:
 print("\n" + "="*60)
 print("🏁 FIM DAS ANÁLISES DE REGRESSÃO LINEAR (Perguntas 1 e 2)")
 print("="*60)
+
+
+
+# ============================================
+# PERGUNTA 3:
+# O QUE REALMENTE FAZ UM CELULAR VENDER?
+# ============================================
+
+print("\n" + "="*60)
+print("🎯 PERGUNTA 3: O que realmente impacta as vendas?")
+print("="*60)
+
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LinearRegression
+
+# ============================================
+# PREPARAR DADOS
+# ============================================
+
+# Criar dataframe agregado por marca
+analise3 = df.groupby('brand').agg({
+    'Price (Dollar)': 'mean',
+    'discount_percentage': 'mean',
+    'rating_out_of_5': 'mean',
+    'RAM (GB)': 'mean',
+    'Storage (GB)': 'mean',
+    'number_of_ratings': 'sum',
+    'ID': 'count'
+}).reset_index()
+
+# Renomear quantidade vendida
+analise3.rename(columns={'ID': 'quantidade_vendida'}, inplace=True)
+
+# Remover nulos
+analise3 = analise3.dropna()
+
+# Filtrar marcas relevantes
+analise3 = analise3[analise3['quantidade_vendida'] >= 15]
+
+print("\n📊 DADOS UTILIZADOS:")
+print(analise3.head())
+
+# ============================================
+# VARIÁVEIS
+# ============================================
+
+X3 = analise3[
+    [
+        'Price (Dollar)',
+        'discount_percentage',
+        'rating_out_of_5',
+        'RAM (GB)',
+        'Storage (GB)',
+        'number_of_ratings'
+    ]
+]
+
+Y3 = analise3['quantidade_vendida']
+
+# ============================================
+# PADRONIZAÇÃO
+# ============================================
+
+scaler = StandardScaler()
+
+X3_scaled = scaler.fit_transform(X3)
+
+# ============================================
+# MODELO
+# ============================================
+
+modelo3 = LinearRegression()
+modelo3.fit(X3_scaled, Y3)
+
+coeficientes = modelo3.coef_
+
+variaveis = X3.columns
+
+# ============================================
+# RESULTADOS
+# ============================================
+
+print("\n📈 IMPACTO DAS VARIÁVEIS:\n")
+
+for nome, coef in zip(variaveis, coeficientes):
+
+    direcao = "AUMENTA" if coef > 0 else "REDUZ"
+
+    print(
+        f"{nome}: "
+        f"{direcao} vendas "
+        f"(Impacto: {coef:.2f})"
+    )
+
+# Score do modelo
+r2 = modelo3.score(X3_scaled, Y3)
+
+print(f"\n📊 R² do modelo: {r2:.3f}")
+
+# ============================================
+# ORGANIZAR IMPORTÂNCIA
+# ============================================
+
+importancia = pd.DataFrame({
+    'variavel': variaveis,
+    'impacto': coeficientes
+})
+
+# Valor absoluto para ranking
+importancia['impacto_absoluto'] = importancia['impacto'].abs()
+
+# Ordenar
+importancia = importancia.sort_values(
+    'impacto_absoluto',
+    ascending=False
+)
+
+print("\n🏆 RANKING DE IMPACTO:")
+print(importancia[['variavel', 'impacto']])
+
+# ============================================
+# GRÁFICO
+# ============================================
+
+plt.figure(figsize=(12,7))
+
+cores = [
+    'green' if x > 0 else 'red'
+    for x in importancia['impacto']
+]
+
+plt.barh(
+    importancia['variavel'],
+    importancia['impacto'],
+    color=cores
+)
+
+plt.axvline(x=0, color='black', linestyle='--')
+
+plt.xlabel('Impacto Padronizado')
+plt.ylabel('Variáveis')
+
+plt.title(
+    'Pergunta 3: O que mais impacta as vendas?'
+)
+
+# Mostrar valores
+for i, valor in enumerate(importancia['impacto']):
+    plt.text(
+        valor,
+        i,
+        f'{valor:.2f}',
+        va='center'
+    )
+
+plt.grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+
+print("\n✅ RESPOSTA 3:")
+print(
+    "Os coeficientes padronizados mostram "
+    "quais características mais influenciam "
+    "as vendas."
+)
+
+
+
+# ============================================
+# PERGUNTA 4:
+# ONDE ESTÁ O PONTO DE VIRADA?
+# ============================================
+
+print("\n" + "="*60)
+print("🎯 PERGUNTA 5: Onde está o ponto de virada?")
+print("="*60)
+
+# ============================================
+# PREPARAR DADOS
+# ============================================
+
+analise5 = df.groupby('brand').agg({
+    'rating_out_of_5': 'mean',
+    'ID': 'count'
+}).reset_index()
+
+analise5.rename(columns={'ID': 'quantidade_vendida'}, inplace=True)
+
+analise5 = analise5.dropna()
+
+analise5 = analise5[
+    analise5['quantidade_vendida'] >= 15
+]
+
+# ============================================
+# DEFINIR LIMIAR
+# ============================================
+
+limiar = 4.0
+
+grupo_baixo = analise5[
+    analise5['rating_out_of_5'] < limiar
+]
+
+grupo_alto = analise5[
+    analise5['rating_out_of_5'] >= limiar
+]
+
+# ============================================
+# MÉDIAS
+# ============================================
+
+media_baixo = grupo_baixo['quantidade_vendida'].mean()
+
+media_alto = grupo_alto['quantidade_vendida'].mean()
+
+print(f"\n📉 Média de vendas abaixo de {limiar}: {media_baixo:.2f}")
+
+print(f"📈 Média de vendas acima de {limiar}: {media_alto:.2f}")
+
+# ============================================
+# VISUALIZAÇÃO
+# ============================================
+
+plt.figure(figsize=(12,7))
+
+# Grupo abaixo
+plt.scatter(
+    grupo_baixo['rating_out_of_5'],
+    grupo_baixo['quantidade_vendida'],
+    color='red',
+    s=100,
+    alpha=0.7,
+    label=f'Abaixo de {limiar}'
+)
+
+# Grupo acima
+plt.scatter(
+    grupo_alto['rating_out_of_5'],
+    grupo_alto['quantidade_vendida'],
+    color='green',
+    s=100,
+    alpha=0.7,
+    label=f'Acima de {limiar}'
+)
+
+# Linha do limiar
+plt.axvline(
+    x=limiar,
+    color='black',
+    linestyle='--',
+    linewidth=2,
+    label='Ponto de Virada'
+)
+
+plt.xlabel('Rating Médio')
+plt.ylabel('Quantidade Vendida')
+
+plt.title(
+    'Pergunta 5: Onde está o ponto de virada?'
+)
+
+plt.legend()
+
+plt.grid(True, alpha=0.3)
+
+plt.tight_layout()
+
+plt.show()
+
+# ============================================
+# CONCLUSÃO
+# ============================================
+
+if media_alto > media_baixo:
+
+    diferenca = media_alto - media_baixo
+
+    print("\n✅ RESPOSTA 5:")
+
+    print(
+        f"Produtos acima de {limiar} estrelas "
+        f'vendem em média {diferenca:.1f} unidades a mais.'
+    )
+
+else:
+
+    print(
+        "\n✅ Não foi encontrado um padrão "
+        "claro de ponto de virada."
+    )
