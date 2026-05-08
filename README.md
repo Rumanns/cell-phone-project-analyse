@@ -1,30 +1,22 @@
 # cell-phone-project-analyse
 
-Este projeto vai além das estatísticas descritivas básicas (média de preço, avaliação mais comum). Utilizamos uma abordagem de pensamento crítico e diagnóstico de dados para extrair **valor real** do dataset de Smartphones da Amazon.
+📁 Códigos do Projeto
 
-Em vez de simplesmente listar o que o dado mostra superficialmente, nós o interrogamos com cinco perguntas projetadas para expor armadilhas estatísticas e oportunidades escondidas:
+01 - Preparação do Ambiente
+Carrega o dataset de celulares da Amazon, trata colunas numéricas (preço, desconto, avaliação, RAM, armazenamento) e agrupa os dados por marca e modelo para as análises seguintes.
 
-1.  **A Ilusão da Métrica:** 📊 *"Quais dados parecem dar resultados muito bons, ou muito ruins, mas na verdade são o oposto?"*
-    - **O que fizemos:** Analisamos a diferença entre o **Valor Aparente vs. Valor Real**. Por exemplo: Um produto com 5 estrelas mas apenas 2 avaliações *parece* perfeito, mas é estatisticamente frágil. Ou um preço baixo que esconde um frete caríssimo. Focamos em desmascarar médias compostas enganosas.
+02 - Regressão Linear
+Mede numericamente a relação entre preço e quantidade vendida (elasticidade), calcula o desconto ideal (ponto de máximo da curva quadrática) e descobre quanto cada estrela de avaliação "vale" em impacto nas vendas.
 
-2.  **Fora da Curva (e Por Quê?):** 🚀 *"O que é completamente fora da curva? E por que aconteceu?"*
-    - **O que fizemos:** Aplicamos **Detecção de Anomalias e Análise de Resíduos**. Identificamos os smartphones cujo preço não condiz com a especificação técnica ou cujo número de vendas destoa totalmente da média da marca. Investigamos se a causa era um erro de scraping, uma promoção relâmpago ou um modelo de nicho específico.
+03 - Árvore de Decisão
+Cria regras do tipo "SE preço < X E avaliação > Y ENTÃO sucesso" para classificar celulares. Mostra combinações específicas de marca, preço e desconto que levam ao fracasso.
 
-3.  **Coincidência ou Causalidade Oculta:** 🔗 *"O que acontece ao mesmo tempo? Será que um realmente causa o outro ou tem um terceiro fator escondido?"*
-    - **O que fizemos:** Investigamos **Correlações Espúrias e Variáveis de Confusão**. Exemplo clássico esperado: *"Mais RAM = Preço Maior"* (correlação real). Mas e *"Mais Reviews = Maior Nota"*? Será que é qualidade ou efeito manada? Buscamos o **Terceiro Fator Escondido** (ex: a *Marca* ou o *Ano de Lançamento*) que explica as duas variáveis simultaneamente.
+04 - Random Forest
+Calcula a importância de cada característica do celular (preço, desconto, avaliação, RAM, marca) para prever vendas. Identifica quais variáveis realmente importam e quais podem ser ignoradas.
 
-4.  **A Alavanca do Negócio:** 💰 *"Qual ponto realmente faz uma diferença palpável? (Agora sim entendi!)"*
-    - **O que fizemos:** **Análise de Alavancagem e Feature Importance preliminar**. Identificamos se a diferença entre um celular de R$ 1.000 e R$ 2.000 é só memória ou se envolve um salto tecnológico (ex: de Tela LCD para AMOLED). O foco é encontrar o **ponto de inflexão** onde o valor percebido muda radicalmente.
-
-5.  **Contexto é Rei:** 🌎 *"O que funciona num contexto mas não funciona em outro?"*
-    - **O que fizemos:** **Segmentação e Análise de Interação entre Variáveis**. Uma tela de 6.7" é um *diferencial* ou um *defeito*? Descobrimos que a resposta depende da **Estratificação**: Para a categoria *Gamer*, é positivo; para a categoria *Custo-Benefício Compacto*, pode ser irrelevante ou negativo. Separamos os dados por faixa de preço e marca para ver como as "regras" mudam.
-
----
-
-### 🧠 Metodologia do Projeto
-O código foi estruturado para responder essas cinco perguntas utilizando Python (Pandas, Matplotlib, Seaborn) e testes estatísticos específicos para evitar conclusões precipitadas baseadas apenas em visualizações bonitas.
+05 - Redes Neurais
+Tenta prever o sucesso de um celular antes do lançamento usando padrões complexos dos dados históricos. Aplicável para recomendação e detecção precoce de tendências.
 
 
 Link dos Dados
 https://www.kaggle.com/datasets/michaelmatta0/amazon-cell-phones-cleaned-scraped-data
-

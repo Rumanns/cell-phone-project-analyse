@@ -440,3 +440,10 @@ else:
         "\n✅ Não foi encontrado um padrão "
         "claro de ponto de virada."
     )
+
+
+
+
+
+
+
